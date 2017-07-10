@@ -1,13 +1,18 @@
 package com.arthur.supermarket.Model;
 
 
+import java.util.ArrayList;
+
 public class Product {
-     public Product(String code, String name, String price, int photo){
+
+    ArrayList<Product> products = new ArrayList<>();
+     public Product(String code, String name, double price, int photo){
          setCode(code);
          setName(name);
          setPrice(price);
          setPhoto(photo);
      }
+
 
 
     public String getCode() {
@@ -26,11 +31,11 @@ public class Product {
         this.name = name;
     }
 
-    public String getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -44,7 +49,7 @@ public class Product {
 
     private String code;
     private String name;
-    private String price;
+    private double price;
     private int photo;
 
 

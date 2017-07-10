@@ -66,10 +66,8 @@ public class TicketAdapter extends RecyclerView.Adapter implements View.OnClickL
 
         ticketViewHolder.name.setText(product.getName());
         ticketViewHolder.code.setText(product.getCode());
-        ticketViewHolder.price.setText(product.getPrice());
-
-
-        //ticketViewHolder.photo.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 330, 330, false));
+        ticketViewHolder.price.setText(Double.toString(product.getPrice()));
+        ticketViewHolder.photo.setImageResource(product.getPhoto());
 
 
     }

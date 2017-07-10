@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.arthur.supermarket.Model.BD;
 import com.arthur.supermarket.Model.Product;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -35,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private Activity activity;
     final ArrayList<Product> products = new ArrayList<Product>();
+    private MediaPlayer mp;
+    private BD bd;
+    private double totalPrice;
 
     public MainActivity() {
     }
@@ -44,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mp = MediaPlayer.create(this, R.raw.beep);
 
         activity = this;
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -51,6 +57,14 @@ public class MainActivity extends AppCompatActivity {
         initToolbar();
         initFloatingButton();
         initRecyclerView();
+
+
+        bd = new BD();
+        bd.postProduct(new Product("5449000000996","Coca-Cola 350ml", 3.15, R.drawable.coca_cola));
+        bd.postProduct(new Product("051000012517","Doritos Queijo Nacho", 10.63, R.drawable.doritos));
+        bd.postProduct(new Product("7891000053508","Nescau", 5.79, R.drawable.nescau));
+        bd.postProduct(new Product("7896051111016","Leite Itambé", 7.81, R.drawable.leite_itambe));
+        bd.postProduct(new Product("7891000252604","Farinha Lactea", 11.42, R.drawable.farinha_lactea));
 
 
 
@@ -76,10 +90,26 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Voce cancelou o scanner", Toast.LENGTH_LONG).show();
             }else{
 
-                Toast.makeText(this, "Item adicionado ao carrinho", Toast.LENGTH_LONG).show();
-                products.add(new Product(result.getContents() , "", "0,0", 1));
-                adapter = new TicketAdapter(products ,getApplicationContext(), recyclerView);
-                recyclerView.setAdapter(adapter);
+
+                Product product =bd.getProductByCode(result.getContents());
+                if(product != null){
+
+                    products.add(product);
+                    adapter = new TicketAdapter(products ,getApplicationContext(), recyclerView);
+                    recyclerView.setAdapter(adapter);
+                    totalPrice += product.getPrice();
+                    double roundOff = Math.round(totalPrice * 100.0) / 100.0;
+
+                    setTitle("Total R$ " + roundOff);
+
+                    mp.start();
+                    Toast.makeText(this, "Item adicionado ao carrinho", Toast.LENGTH_LONG).show();
+
+                }else{
+                    Toast.makeText(this, "Item não cadastrado" + result.getContents(), Toast.LENGTH_LONG).show();
+                }
+
+
 
             }
         }
@@ -123,6 +153,15 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.action_options:
+                products.clear();
+                adapter = new TicketAdapter(products ,getApplicationContext(), recyclerView);
+                recyclerView.setAdapter(adapter);
+
+                totalPrice = 0;
+                double roundOff = Math.round(totalPrice * 100.0) / 100.0;
+
+                setTitle("Total R$ " + roundOff);
+
                 return true;
 
         }
@@ -168,14 +207,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideViews() {
-        //appBarLayout.animate().translationY(-appBarLayout.getHeight()).setInterpolator(new AccelerateInterpolator(2));
-        //FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) createTicketFloatingButton.getLayoutParams();
-        //int fabBottomMargin = lp.bottomMargin;
-        //createTicketFloatingButton.animate().translationY(createTicketFloatingButton.getHeight()+fabBottomMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+        /*
+        appBarLayout.animate().translationY(-appBarLayout.getHeight()).setInterpolator(new AccelerateInterpolator(2));
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) addProductFloatingButton.getLayoutParams();
+        int fabBottomMargin = lp.bottomMargin;
+        addProductFloatingButton.animate().translationY(addProductFloatingButton.getHeight()+fabBottomMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+        */
     }
 
     private void showViews() {
-        //appBarLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-        //createTicketFloatingButton.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+        /*
+        appBarLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+        addProductFloatingButton.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+        */
     }
 }
